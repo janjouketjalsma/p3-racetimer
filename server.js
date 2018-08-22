@@ -6,6 +6,15 @@ var server = net.createServer(function(socket) {
 });
 server.listen(5403, '127.0.0.1');
 
+server.on("connection", function(socket){
+    setInterval(function(){
+        socket.write(hex_to_ascii('8e023300cf02000001000104b29b0100030427fc70000408e819e6bd8a7504000502330006021000080200008104fc0504008f'), 'ascii');
+    },10*1000);
+
+});
+
+
+
 function hex_to_ascii(str1)
 {
     var hex  = str1.toString();
