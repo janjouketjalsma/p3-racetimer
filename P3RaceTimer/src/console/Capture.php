@@ -1,4 +1,5 @@
 <?php
+
 namespace P3RaceTimer\Console;
 
 use League\CLImate\CLImate;
@@ -17,25 +18,30 @@ final class Capture
 
     public function __construct(CLImate $climate, P3Parser $p3Parser, Socket $p3Socket)
     {
-        $this->climate  = $climate;
+        $this->climate = $climate;
         $this->p3Parser = $p3Parser;
         $this->p3Socket = $p3Socket;
     }
 
     public function __invoke(Request $request, Response $response, $args)
     {
-        $this->climate->out('Capturing data from '.$this->p3Socket->getSockName());
+        $this->climate->out('Capturing data from ' . $this->p3Socket->getSockName());
         while (true) {
-            $record = $this->p3Socket->read(1024);
+            $data = $this->p3Socket->read(1024);
 
-            $this->handleRecord($record);
-            die();
+            $this->handleData($data);
         }
     }
 
-    protected function handleRecord($record)
+    protected function handleData($data)
     {
-        $data = $this->p3Parser->parse($record);
-        $this->climate->dump($data);
+        $records            = $this->p3Parser->trimData($data);
+        $completeRecords    = $this->p3Parser->getRecords($records);
+
+        foreach ($completeRecords as $record) {
+            $record = $this->p3Parser->parse($record);
+            $this->climate->dump($record);
+        }
+
     }
 }
