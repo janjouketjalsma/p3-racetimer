@@ -40,7 +40,15 @@ final class Capture
 
         foreach ($completeRecords as $record) {
             $record = $this->p3Parser->parse($record);
-            $this->climate->dump($record);
+
+            if($record){
+                $this->climate->dump($record);
+
+                // Example: output record date as string
+                $recordTime = \DateTime::createFromFormat('U', round ($record["RTC_TIME"] / 1000000));
+                $this->climate->out('Got record on '.$recordTime->format('Y-m-d H:i:s'));
+            }
+
         }
 
     }
