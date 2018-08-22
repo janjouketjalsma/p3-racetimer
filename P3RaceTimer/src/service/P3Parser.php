@@ -88,7 +88,7 @@ class P3Parser
 		$info['length']=ord(substr($record,0x2,2));
 		$info['crc']=$this->format_value(substr($record,0x4,2),true);
 		$info['flags_header']=$this->format_value(substr($record,0x6,2),true);
-		$info['type']=$this->format_value(substr($record,0x8,2), true); //Get record type
+		$info['type']=$this->format_value(substr($record,0x8,2)); //Get record type
 		$info['record_hex']=$this->format_value($record,true,false); //Get the complete record as a readable hex string
 		return $info;
 	}
@@ -137,7 +137,6 @@ class P3Parser
 		if($typefilter!==false && $header['type']!=$typefilter) //Type is not wanted
 			return true;
 
-		echo $this->messages[$header['type']];
 		if(isset($this->messages[$header['type']])) //Check if the message can be parsed
 		{
 			$fields=$this->messages[$header['type']] + $this->messages['general'];
