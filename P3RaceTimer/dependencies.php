@@ -19,7 +19,7 @@ $container['p3Parser'] = function ($c) {
     return $p3Parser;
 };
 
-// P3 TCP socket
+// P3 TCP socket for listening to decoder
 $container['p3Socket'] = function ($c) {
     $settings = $c->get('settings');
     $factory  = new \Socket\Raw\Factory();
@@ -27,10 +27,19 @@ $container['p3Socket'] = function ($c) {
     return $p3Socket;
 };
 
+// Event socket for emitting events
+$container['eventServerSocket'] = function ($c) {
+    $settings = $c->get('settings');
+    $factory  = new \Socket\Raw\Factory();
+    $eventServerSocket = $factory->createServer('tcp://'.$settings['eventSocket']['host']);
+
+    return $eventServerSocket;
+};
+
 // -----------------------------------------------------------------------------
 // Action factories
 // -----------------------------------------------------------------------------
 
 $container[P3RaceTimer\Console\Capture::class] = function ($c) {
-    return new P3RaceTimer\Console\Capture($c->get('climate'), $c->get('p3Parser'), $c->get('p3Socket'));
+    return new P3RaceTimer\Console\Capture($c->get('climate'), $c->get('p3Parser'), $c->get('p3Socket') , $c->get('eventServerSocket'));
 };

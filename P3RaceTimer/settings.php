@@ -13,6 +13,9 @@ return [
         'displayErrorDetails' => getenv('APP_DEBUG') ? true : false,
         'p3Socket' => [
             'host' => getenv('P3_HOST') ?: '127.0.0.1:5403'
+        ],
+        'eventSocket' => [
+            'host' => getenv('EVENT_HOST') ?: '127.0.0.1:6000'
         ]
     ]
 ];

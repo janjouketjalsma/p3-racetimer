@@ -15,12 +15,14 @@ final class Capture
     protected $climate;
     protected $p3Parser;
     protected $p3Socket;
+    protected $eventServerSocket;
 
-    public function __construct(CLImate $climate, P3Parser $p3Parser, Socket $p3Socket)
+    public function __construct(CLImate $climate, P3Parser $p3Parser, Socket $p3Socket, Socket $eventServerSocket)
     {
         $this->climate = $climate;
         $this->p3Parser = $p3Parser;
         $this->p3Socket = $p3Socket;
+        $this->eventServerSocket = $eventServerSocket;
     }
 
     public function __invoke(Request $request, Response $response, $args)
@@ -35,18 +37,24 @@ final class Capture
 
     protected function handleData($data)
     {
-        $records            = $this->p3Parser->trimData($data);
-        $completeRecords    = $this->p3Parser->getRecords($records);
+        $records = $this->p3Parser->trimData($data);
+        $completeRecords = $this->p3Parser->getRecords($records);
 
         foreach ($completeRecords as $record) {
             $record = $this->p3Parser->parse($record);
 
-            if($record){
+            if ($record) {
                 $this->climate->dump($record);
 
                 // Example: output record date as string
-                $recordTime = \DateTime::createFromFormat('U', round ($record["RTC_TIME"] / 1000000));
-                $this->climate->out('Got record on '.$recordTime->format('Y-m-d H:i:s'));
+                $recordTime = \DateTime::createFromFormat('U', round($record["RTC_TIME"] / 1000000));
+                $this->climate->out('Got record on ' . $recordTime->format('Y-m-d H:i:s'));
+
+                // Emit event
+                if($this->eventServerSocket->selectWrite()){
+                    $this->eventServerSocket->write("RECORD_RECEIVED");
+                }
+
             }
 
         }
