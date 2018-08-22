@@ -55,8 +55,6 @@ class P3Parser
 
     public function trimData($data, $debug = false) //Trim data to only contain complete records
     {
-        //var_dump(dechex(ord(substr($data,0,1))));
-        //var_dump(dechex(ord(substr($data,-1,1))));
         $start = strpos($data, chr(0x8E));
         $end = strrpos($data, chr(0x8F));
         return substr($data, $start, $end - $start + 1); //Trim the string to get only complete messages
@@ -73,7 +71,6 @@ class P3Parser
         //Returns an array for a valid record
         //Returns bool false for errors
         //Returns bool true for records skipped by type filter
-        //echo $record;
         $record = $this->unescape($record);
         if (ord(substr($record, 0, 1)) != 0x8E || ord(substr($record, -1, 1)) != 0x8F) { //Verify that the provided string is a complete record
             trigger_error("Invalid record");
@@ -148,8 +145,6 @@ class P3Parser
 
     public function readFields($record, $fields) //Read the fields of a record according to an array with field definations
     {
-        $record_key = 0;
-        $strlen = strlen($record);
         for ($pos = 0xA; $pos < strlen($record) - 1; $pos++) { //Parse body
             $field_id = ord($record[$pos]); //The first byte of a message is the field ID
             if (!isset($fields[$field_id])) {
@@ -159,7 +154,6 @@ class P3Parser
             }
             $field_name = $fields[$field_id]; //Get the field name
             $length = ord(substr($record, $pos + 1, 1)); //After the field ID we find the message length
-            //echo "Length: $length\n";
             $messages[$field_name] = $this->formatValue(substr($record, $pos + 2, $length));
             $pos = $pos + $length + 1;
         }
