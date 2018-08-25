@@ -15,7 +15,7 @@ return [
             'host' => getenv('P3_HOST') ?: '127.0.0.1:5403'
         ],
         'eventSocket' => [
-            'host' => getenv('EVENT_HOST') ?: '127.0.0.1:6000'
+            'port' => getenv('EVENT_PORT') ?: '6000'
         ]
     ]
 ];

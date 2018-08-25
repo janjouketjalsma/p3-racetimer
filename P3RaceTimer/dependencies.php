@@ -31,9 +31,19 @@ $container['p3Socket'] = function ($c) {
 $container['eventServerSocket'] = function ($c) {
     $settings = $c->get('settings');
     $factory  = new \Socket\Raw\Factory();
-    $eventServerSocket = $factory->createServer('tcp://'.$settings['eventSocket']['host']);
+    $eventServerSocket = $factory->createServer('tcp://127.0.0.1:'.$settings['eventSocket']['port']);
 
     return $eventServerSocket;
+};
+
+
+// Event socket for emitting events
+$container['eventClientSocket'] = function ($c) {
+    $settings = $c->get('settings');
+    $factory  = new \Socket\Raw\Factory();
+    $eventClientSocket = $factory->createClient('tcp://127.0.0.1:'.$settings['eventSocket']['port']);
+
+    return $eventClientSocket;
 };
 
 // -----------------------------------------------------------------------------
@@ -43,3 +53,12 @@ $container['eventServerSocket'] = function ($c) {
 $container[P3RaceTimer\Console\Capture::class] = function ($c) {
     return new P3RaceTimer\Console\Capture($c->get('climate'), $c->get('p3Parser'), $c->get('p3Socket') , $c->get('eventServerSocket'));
 };
+
+$container[P3RaceTimer\Console\WebSocketServer::class] = function ($c) {
+    return new P3RaceTimer\Console\WebSocketServer(
+        $c->get('climate'),
+        new P3RaceTimer\service\WebSocketPusher,
+        $c->get('eventClientSocket')
+    );
+};
+

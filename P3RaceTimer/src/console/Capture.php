@@ -51,8 +51,19 @@ final class Capture
                 $this->climate->out('Got record on ' . $recordTime->format('Y-m-d H:i:s'));
 
                 // Emit event
+                $this->eventServerSocket->write(json_encode([
+                    "type" => "INFO",
+                    "message" => "Received record from decoder"
+                ]));
+
                 if($this->eventServerSocket->selectWrite()){
-                    $this->eventServerSocket->write("RECORD_RECEIVED");
+                    $this->eventServerSocket->write(json_encode([
+                        "type" => "INFO",
+                        "message" => "Received record from decoder"
+                    ]));
+                    $this->climate->out('Pushing event');
+                }else{
+                    $this->climate->out('Cannot push event');
                 }
 
             }
