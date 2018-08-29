@@ -10,7 +10,7 @@ use Ratchet;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-final class WebSocketServer
+final class EventProcessor
 {
 
     protected $climate;

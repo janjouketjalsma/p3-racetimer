@@ -91,8 +91,8 @@ $container[P3RaceTimer\Console\Capture::class] = function ($c) {
     );
 };
 
-$container[P3RaceTimer\Console\WebSocketServer::class] = function ($c) {
-    return new P3RaceTimer\Console\WebSocketServer(
+$container[P3RaceTimer\Console\EventProcessor::class] = function ($c) {
+    return new P3RaceTimer\Console\EventProcessor(
         $c->get('climate'),
         $c->get('eventServerSocketPromise'),
         $c->get('webSocketPusher'),
