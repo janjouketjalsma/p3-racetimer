@@ -4,7 +4,8 @@ namespace P3RaceTimer\Console;
 
 use League\CLImate\CLImate;
 use P3RaceTimer\service\WebSocketPusher;
-use Socket\Raw\Socket;
+use React;
+use Ratchet;
 
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -13,46 +14,29 @@ final class WebSocketServer
 {
 
     protected $climate;
-    protected $eventClientSocket;
-    private $webSocketPusher;
+    protected $eventSocketPromise;
+    protected $webSocketPusher;
+    protected $loop;
 
-    public function __construct(CLImate $climate, WebSocketPusher $webSocketPusher, Socket $eventClientSocket)
+    public function __construct(CLImate $climate, React\Promise\PromiseInterface $eventSocketPromise, WebSocketPusher $webSocketPusher, React\EventLoop\LoopInterface $loop)
     {
-        $this->climate = $climate;
-        $this->eventClientSocket = $eventClientSocket;
-        $this->webSocketPusher = $webSocketPusher;
+        $this->climate            = $climate;
+        $this->eventSocketPromise = $eventSocketPromise;
+        $this->webSocketPusher    = $webSocketPusher;
+        $this->loop               = $loop;
     }
 
     public function __invoke(Request $request, Response $response, $args)
     {
-        $this->climate->out('Waiting for events on connection with ' . $this->eventClientSocket->getSockName());
+        $this->climate->out('Waiting for events on connection');
 
-        while (true) {
-            $data = $this->eventClientSocket->read(8192);
-            $this->climate->dump(json_decode($data));
-        }
-
-        /*
-
-        $loop   = React\EventLoop\Factory::create();
-
-        $loop->addPeriodicTimer(1, function () {
-            echo "Tick\n";
+        $this->eventSocketPromise->then(function (React\Datagram\Socket $eventSocket) {
+            $eventSocket->on('message', function ($message, $serverAddress, $eventSocket) {
+                $this->climate->out('received "' . $message . '" from ' . $serverAddress);
+                $this->webSocketPusher->onEvent($message);
+            });
         });
 
-        // Set up our WebSocket server for clients wanting real-time updates
-        $webSock = new React\Socket\Server('0.0.0.0:8080', $loop); // Binding to 0.0.0.0 means remotes can connect
-        $webServer = new Ratchet\Server\IoServer(
-            new Ratchet\Http\HttpServer(
-                new Ratchet\WebSocket\WsServer(
-                    new Ratchet\Wamp\WampServer(
-                        $this->webSocketPusher
-                    )
-                )
-            ),
-            $webSock
-        );
-
-        $loop->run();*/
+        $this->loop->run();
     }
 }

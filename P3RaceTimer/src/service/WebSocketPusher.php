@@ -91,11 +91,11 @@ class WebSocketPusher implements WampServerInterface {
         $eventData = json_decode($event, true);
 
         // If the lookup topic object isn't set there is no one to publish to
-        if (!array_key_exists($eventData['INFO'], $this->subscribedTopics)) {
+        if (!array_key_exists($eventData['topic'], $this->subscribedTopics)) {
             return;
         }
 
-        $topic = $this->subscribedTopics[$eventData['INFO']];
+        $topic = $this->subscribedTopics[$eventData['topic']];
 
         // re-send the data to all the clients subscribed to that event type
         $topic->broadcast($eventData);
