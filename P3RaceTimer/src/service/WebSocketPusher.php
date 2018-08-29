@@ -85,7 +85,7 @@ class WebSocketPusher implements WampServerInterface {
     }
 
     /**
-     * @param string JSON'ified string we'll receive from ZeroMQ
+     * @param string JSON'ified string
      */
     public function onEvent($event) {
         $eventData = json_decode($event, true);
@@ -99,7 +99,8 @@ class WebSocketPusher implements WampServerInterface {
 
         // re-send the data to all the clients subscribed to that event type
         $topic->broadcast($eventData);
+
+        $all = $this->subscribedTopics["ALL"];
+        $all->broadcast($eventData);
     }
-
-
 }
