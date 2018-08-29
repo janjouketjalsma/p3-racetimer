@@ -68,8 +68,8 @@ final class Capture
 
                 // Send record to eventSocket
                 $eventSocket->send(json_encode([
-                  "topic" => "INFO",
-                  "event" => "Received record",
+                  "source" => "p3connection",
+                  "event" => $record["type_string"],
                   "record" => $record
                 ]));
             }

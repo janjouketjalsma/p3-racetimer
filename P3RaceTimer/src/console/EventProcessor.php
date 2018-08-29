@@ -33,10 +33,22 @@ final class EventProcessor
         $this->eventSocketPromise->then(function (React\Datagram\Socket $eventSocket) {
             $eventSocket->on('message', function ($message, $serverAddress, $eventSocket) {
                 $this->climate->out('received "' . $message . '" from ' . $serverAddress);
-                $this->webSocketPusher->onEvent($message);
+
+                $messageData = \json_decode($message, true);
+
+                if (isset($messageData["source"])) {
+                    if ($messageData["source"] == "p3connection") {
+                        $this->notifyWebSocket($messageData["event"], $messageData["record"]);
+                    }
+                }
             });
         });
 
         $this->loop->run();
+    }
+
+    public function notifyWebSocket($topic, $eventData)
+    {
+        $this->webSocketPusher->onEvent($topic, $eventData);
     }
 }
