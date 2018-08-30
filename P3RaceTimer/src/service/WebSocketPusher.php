@@ -1,5 +1,5 @@
 <?php
-namespace P3RaceTimer\service;
+namespace P3RaceTimer\Service;
 
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;

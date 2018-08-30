@@ -15,7 +15,7 @@ $container['climate'] = function ($c) {
 
 // P3 parser
 $container['p3Parser'] = function ($c) {
-    $p3Parser = new P3RaceTimer\service\P3Parser;
+    $p3Parser = new P3RaceTimer\Service\P3Parser;
     return $p3Parser;
 };
 
@@ -49,7 +49,7 @@ $container['eventSocketPromise'] = function ($c) {
 
 $container['webSocketPusher'] = function ($c) {
     $settings   = $c->get('settings');
-    $pusher     = new P3RaceTimer\service\WebSocketPusher;
+    $pusher     = new P3RaceTimer\Service\WebSocketPusher;
     $loop       = $c->get('loop');
     $webSock    = new React\Socket\Server('0.0.0.0:'.$settings['webSocket']['port'], $loop); // Binding to 0.0.0.0 means remotes can connect
     $webServer  = new Ratchet\Server\IoServer(

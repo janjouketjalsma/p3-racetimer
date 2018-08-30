@@ -1,6 +1,6 @@
 <?php
 
-namespace P3RaceTimer\service;
+namespace P3RaceTimer\Service;
 
 /**
  * Credits go to: https://github.com/datagutten/amb-p3-parser

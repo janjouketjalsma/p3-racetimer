@@ -3,7 +3,7 @@
 namespace P3RaceTimer\Console;
 
 use League\CLImate\CLImate;
-use P3RaceTimer\service\P3Parser;
+use P3RaceTimer\Service\P3Parser;
 use React;
 use React\EventLoop\LoopInterface;
 use React\Promise;

@@ -3,7 +3,7 @@
 namespace P3RaceTimer\Console;
 
 use League\CLImate\CLImate;
-use P3RaceTimer\service\WebSocketPusher;
+use P3RaceTimer\Service\WebSocketPusher;
 use React;
 use Ratchet;
 
