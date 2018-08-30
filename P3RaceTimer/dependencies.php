@@ -105,6 +105,8 @@ $container[P3RaceTimer\Console\EventProcessor::class] = function ($c) {
         $c->get('climate'),
         $c->get('eventServerSocketPromise'),
         $c->get('webSocketPusher'),
-        $c->get('loop')
+        $c->get('loop'),
+        $c->get('em')->getRepository("P3RaceTimer\Entity\Transponder"),
+        $c->get('em')->getRepository("P3RaceTimer\Entity\Passing")
     );
 };

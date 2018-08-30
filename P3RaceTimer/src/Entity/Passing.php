@@ -24,7 +24,7 @@ class Passing
     private $passingNumber;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Transponder", inversedBy="passings")
+     * @ORM\ManyToOne(targetEntity="Transponder", inversedBy="passings", cascade={"persist"})
      */
     private $transponder;
 
@@ -97,7 +97,7 @@ class Passing
     /**
      * Set rtc
      *
-     * @param string $rtc
+     * @param integer $rtc
      *
      * @return \P3RaceTimer\Entity\Passing
      */
