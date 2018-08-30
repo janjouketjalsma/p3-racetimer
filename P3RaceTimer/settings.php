@@ -19,6 +19,21 @@ return [
         ],
         'webSocket' => [
             'port' => getenv('EVENT_PORT') ?: '8080'
-        ]
+        ],
+        // doctrine settings
+        'doctrine' => [
+            'meta' => [
+                'entity_path' => [
+                    __DIR__.'/src/Entity'
+                ],
+                'auto_generate_proxies' => true,
+                'proxy_dir' =>  __DIR__.'/../cache/proxies',
+                'cache' => null,
+            ],
+            'connection' => [
+              'driver' => 'pdo_sqlite',
+              'path' => __DIR__.'/../db.sqlite'
+            ]
+        ],
     ]
 ];

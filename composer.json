@@ -8,11 +8,16 @@
         "react/socket": "1.0",
         "react/event-loop": "1.0",
         "react/datagram": "1.4",
-        "cboden/ratchet": "^0.4.1"
+        "cboden/ratchet": "^0.4.1",
+        "doctrine/orm": "^2.6"
     },
     "autoload": {
         "psr-4": {
             "P3RaceTimer\\": "P3RaceTimer/src"
         }
+    },
+    "scripts": {
+        "start": "php -S 0.0.0.0:8080 -t public public/index.php",
+        "post-install-cmd": "php vendor/doctrine/orm/bin/doctrine orm:schema-tool:create"
     }
 }
