@@ -18,7 +18,7 @@ return [
             'port' => getenv('EVENT_PORT') ?: '6000'
         ],
         'webSocket' => [
-            'port' => getenv('EVENT_PORT') ?: '8080'
+            'port' => getenv('WEBSOCKET_PORT') ?: '8080'
         ],
         // doctrine settings
         'doctrine' => [
