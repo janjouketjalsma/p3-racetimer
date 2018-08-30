@@ -77,6 +77,14 @@ $container['eventServerSocketPromise'] = function ($c) {
     return $eventServerSocketPromise;
 };
 
+// Doctrine
+$container['em'] = function ($c) {
+    $settings = $c->get('settings');
+    $service = new P3RaceTimer\Service\Doctrine($settings['doctrine']);
+    $entityManager = $service->entityManager();
+    return $entityManager;
+};
+
 // -----------------------------------------------------------------------------
 // Action factories
 // -----------------------------------------------------------------------------
@@ -87,7 +95,8 @@ $container[P3RaceTimer\Console\Capture::class] = function ($c) {
         $c->get('p3Parser'),
         $c->get('p3SocketPromise'),
         $c->get('eventSocketPromise'),
-        $c->get('loop')
+        $c->get('loop'),
+        $c->get('em')->getRepository("P3RaceTimer\Entity\DecoderMessage")
     );
 };
 

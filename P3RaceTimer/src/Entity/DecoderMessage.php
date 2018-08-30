@@ -76,7 +76,7 @@ class DecoderMessage
     /**
      * Set processed message
      *
-     * @param string $processed
+     * @param array $processed
      *
      * @return DecoderMessage
      */
@@ -90,7 +90,7 @@ class DecoderMessage
     /**
      * Get processed message
      *
-     * @return string
+     * @return array
      */
     public function getProcessed()
     {

@@ -9,6 +9,7 @@ use React\EventLoop\LoopInterface;
 use React\Promise;
 use React\Promise\PromiseInterface;
 use React\Socket\ConnectionInterface;
+use P3RaceTimer\Entity\DecoderMessageRepository;
 
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -20,14 +21,22 @@ final class Capture
     protected $p3Parser;
     protected $p3ConnectorPromise;
     protected $eventSocketPromise;
+    protected $decoderMessageRepository;
 
-    public function __construct(CLImate $climate, P3Parser $p3Parser, PromiseInterface $p3ConnectorPromise, PromiseInterface $eventSocketPromise, LoopInterface $loop)
-    {
-        $this->climate              = $climate;
-        $this->p3Parser             = $p3Parser;
-        $this->p3ConnectorPromise   = $p3ConnectorPromise;
-        $this->eventSocketPromise   = $eventSocketPromise;
-        $this->loop                 = $loop;
+    public function __construct(
+        CLImate $climate,
+        P3Parser $p3Parser,
+        PromiseInterface $p3ConnectorPromise,
+        PromiseInterface $eventSocketPromise,
+        LoopInterface $loop,
+        DecoderMessageRepository $decoderMessageRepository
+    ) {
+        $this->climate                  = $climate;
+        $this->p3Parser                 = $p3Parser;
+        $this->p3ConnectorPromise       = $p3ConnectorPromise;
+        $this->eventSocketPromise       = $eventSocketPromise;
+        $this->loop                     = $loop;
+        $this->decoderMessageRepository = $decoderMessageRepository;
     }
 
     public function __invoke(Request $request, Response $response, $args)
@@ -57,22 +66,31 @@ final class Capture
         $completeRecords = $this->p3Parser->getRecords($records);
 
         foreach ($completeRecords as $record) {
-            $record = $this->p3Parser->parse($record);
+            $parsedRecord = $this->p3Parser->parse($record);
 
-            if ($record) {
-                $this->climate->dump($record);
+            if ($parsedRecord) {
+                $this->climate->dump($parsedRecord);
 
                 // Example: output record date as string
-                $recordTime = \DateTime::createFromFormat('U', round($record["RTC_TIME"] / 1000000));
+                $recordTime = \DateTime::createFromFormat('U', round($parsedRecord["RTC_TIME"] / 1000000));
                 $this->climate->out('Got record with date: ' . $recordTime->format('Y-m-d H:i:s'));
 
                 // Send record to eventSocket
                 $eventSocket->send(json_encode([
-                  "source" => "p3connection",
-                  "event" => $record["type_string"],
-                  "record" => $record
+                    "source" => "p3connection",
+                    "event" => $parsedRecord["type_string"],
+                    "record" => $parsedRecord
                 ]));
             }
+
+            // Create message entity
+            $decoderMessage = $this->decoderMessageRepository->create($record, $parsedRecord ?: null);
+
+            // Prepare database insert
+            $this->decoderMessageRepository->prepare($decoderMessage);
         }
+
+        // Insert messages into database
+        $this->decoderMessageRepository->savePrepared();
     }
 }
