@@ -12,6 +12,11 @@
                 console.log('New passing', data);
             });
 
+            conn.subscribe('FINISHED_LAP', function(topic, data) {
+                // This is where you would add the new article to the DOM (beyond the scope of this tutorial)
+                console.log('New finished lap', data);
+            });
+
             conn.subscribe('ALL', function(topic, data) {
                 // This is where you would add the new article to the DOM (beyond the scope of this tutorial)
                 console.log('New event', data);
