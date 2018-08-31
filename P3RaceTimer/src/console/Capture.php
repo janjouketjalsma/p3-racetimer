@@ -72,8 +72,10 @@ final class Capture
                 $this->climate->dump($parsedRecord);
 
                 // Example: output record date as string
-                $recordTime = \DateTime::createFromFormat('U', round($parsedRecord["RTC_TIME"] / 1000000));
-                $this->climate->out('Got record with date: ' . $recordTime->format('Y-m-d H:i:s'));
+                if(isset($parsedRecord["RTC_TIME"])){
+                    $recordTime = \DateTime::createFromFormat('U', round($parsedRecord["RTC_TIME"] / 1000000));
+                    $this->climate->out('Got record with date: ' . $recordTime->format('Y-m-d H:i:s'));
+                }
 
                 // Send record to eventSocket
                 $eventSocket->send(json_encode([
