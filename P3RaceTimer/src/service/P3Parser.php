@@ -36,7 +36,8 @@ class P3Parser
             0x04 => 'RTC_TIME',
             0x05 => 'STRENGTH',
             0x06 => 'HITS',
-            0x08 => 'FLAGS'
+            0x08 => 'FLAGS',
+            0x0A => 'TRANSPONDER'
         ],
         0x02 => [
             0x01 => 'NOISE',
@@ -155,7 +156,11 @@ class P3Parser
             }
             $field_name = $fields[$field_id]; //Get the field name
             $length = ord(substr($record, $pos + 1, 1)); //After the field ID we find the message length
-            $messages[$field_name] = $this->formatValue(substr($record, $pos + 2, $length));
+            if ($field_id == 0x0A) {
+                $messages[$field_name] = substr($record, $pos + 2, $length);
+            } else {
+                $messages[$field_name] = $this->formatValue(substr($record, $pos + 2, $length));
+            }
             $pos = $pos + $length + 1;
         }
 
