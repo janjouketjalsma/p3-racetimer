@@ -89,6 +89,11 @@ class WebSocketPusher implements WampServerInterface {
      */
     public function onEvent($topic, $eventData)
     {
+        // Always broadcast to all
+        $all = $this->subscribedTopics["ALL"];
+        if ($all) {
+            $all->broadcast($eventData);
+        }
 
         // If the lookup topic object isn't set there is no one to publish to
         if (!array_key_exists($topic, $this->subscribedTopics)) {
@@ -100,7 +105,6 @@ class WebSocketPusher implements WampServerInterface {
         // re-send the data to all the clients subscribed to that event type
         $topic->broadcast($eventData);
 
-        $all = $this->subscribedTopics["ALL"];
-        $all->broadcast($eventData);
+
     }
 }
