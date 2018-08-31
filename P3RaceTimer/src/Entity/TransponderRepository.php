@@ -7,15 +7,15 @@ use Doctrine\ORM\EntityRepository;
 
 class TransponderRepository extends EntityRepository
 {
-    public function findById($identifier)
+    public function findByIdentifier($identifier)
     {
         return $this->find($identifier);
     }
 
-    public function create($transponderId)
+    public function create($transponderIdentifier)
     {
         $transponder = new Transponder();
-        $transponder  ->setId($transponderId);
+        $transponder  ->setIdentifier($transponderIdentifier);
 
         return $transponder;
     }

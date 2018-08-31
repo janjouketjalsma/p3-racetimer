@@ -14,8 +14,14 @@ class Transponder
   /**
    * @ORM\Id
    * @ORM\Column(name="id", type="integer")
+   * @ORM\GeneratedValue(strategy="AUTO")
    */
     private $id;
+
+    /**
+     * @ORM\Column(type="string", unique=true)
+     */
+    private $identifier;
 
     /**
      * @ORM\OneToMany(targetEntity="Passing", mappedBy="transponder")
@@ -29,22 +35,17 @@ class Transponder
     private $team;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Participant", inversedBy="transponders")
+     * @ORM\JoinColumn(name="Participant_id", referencedColumnName="id", nullable=true)
+     */
+    private $participant;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->passings = new \Doctrine\Common\Collections\ArrayCollection();
-    }
-
-    /**
-     * Set id
-     *
-     * @return integer
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
     }
 
     /**
@@ -56,6 +57,28 @@ class Transponder
     {
         return $this->id;
     }
+
+    /**
+     * Set identifier
+     */
+    public function setIdentifier($identifier)
+    {
+        $this->identifier = $identifier;
+
+        return $this;
+    }
+
+    /**
+     * Get identifier
+     *
+     * @return integer
+     */
+    public function getIdentifier()
+    {
+        return $this->identifier;
+    }
+
+
 
     /**
      * Get passings

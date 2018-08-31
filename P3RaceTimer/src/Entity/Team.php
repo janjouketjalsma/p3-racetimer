@@ -19,6 +19,11 @@ class Team
     private $id;
 
     /**
+     * @ORM\Column(type="string", unique=true)
+     */
+    private $name;
+
+    /**
      * @ORM\OneToMany(targetEntity="Transponder", mappedBy="team")
      */
     private $transponders;
@@ -39,6 +44,30 @@ class Team
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     *
+     * @return Team
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
