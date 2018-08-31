@@ -62,7 +62,7 @@ class P3Parser
 
     public function getRecords($data) //Get all records from a string
     {
-        preg_match_all('/' . chr(0x8E) . '.+?' . chr(0x8F) . '/', $data, $records_preg);
+        preg_match_all('/' . chr(0x8E) . '\X+?' . chr(0x8F) . '/', $data, $records_preg);
         return $records_preg[0];
     }
 
