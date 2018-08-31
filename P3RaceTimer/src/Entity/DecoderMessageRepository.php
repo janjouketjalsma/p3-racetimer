@@ -8,7 +8,7 @@ class DecoderMessageRepository extends EntityRepository
 {
     public function findById($identifier)
     {
-        return $this->find($identifier);
+        return $this->findOneBy($identifier);
     }
 
     public function create(string $raw, array $processed = null)

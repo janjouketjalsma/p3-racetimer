@@ -8,6 +8,10 @@ use React;
 use Ratchet;
 use P3RaceTimer\Entity\TransponderRepository;
 use P3RaceTimer\Entity\PassingRepository;
+use P3RaceTimer\Entity\LapRepository;
+use P3RaceTimer\Entity\Transponder;
+use P3RaceTimer\Entity\Team;
+use P3RaceTimer\Entity\Passing;
 
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -21,6 +25,7 @@ final class EventProcessor
     protected $loop;
     protected $transponderRepository;
     protected $passingRepository;
+    protected $lapRepository;
 
     public function __construct(
         CLImate $climate,
@@ -28,7 +33,8 @@ final class EventProcessor
         WebSocketPusher $webSocketPusher,
         React\EventLoop\LoopInterface $loop,
         TransponderRepository $transponderRepository,
-        PassingRepository $passingRepository
+        PassingRepository $passingRepository,
+        LapRepository $lapRepository
     ) {
         $this->climate                = $climate;
         $this->eventSocketPromise     = $eventSocketPromise;
@@ -36,7 +42,7 @@ final class EventProcessor
         $this->loop                   = $loop;
         $this->transponderRepository  = $transponderRepository;
         $this->passingRepository      = $passingRepository;
-
+        $this->lapRepository          = $lapRepository;
     }
 
     public function __invoke(Request $request, Response $response, $args)
@@ -72,7 +78,7 @@ final class EventProcessor
     protected function processP3message($type, $eventData)
     {
         if ($type == "PASSING") {
-            $transponder = $this->getOrCreateTransponder($eventData["TRANSPONDER"]);
+            $transponder = $this->transponderRepository->getOrCreateTransponder($eventData["TRANSPONDER"]);
 
             $passing = $this->passingRepository->create(
                 $eventData["PASSING_NUMBER"],
@@ -81,17 +87,54 @@ final class EventProcessor
             );
 
             $this->passingRepository->save($passing);
+
+            $team = $transponder->getTeam();
+
+            if ($team) {
+                $this->startOrFinishLap($passing, $team);
+            }
         }
     }
 
-    protected function getOrCreateTransponder($transponderId)
+    protected function startOrFinishLap(Passing $passing, Team $team)
     {
-        $transponder = $this->transponderRepository->findById($transponderId);
+        $openLap = $this->lapRepository->findOpenLap($team);
 
-        if (!$transponder) {
-            $transponder = $this->transponderRepository->create($transponderId);
+        if ($openLap) {
+            $finishPassing  = $passing;
+            $startPassing   = $openLap->getStartPassing($team);
+            $rtcDiff        = $finishPassing->getRtc() - $startPassing->getRtc();
+
+            $openLap->setFinishPassing($finishPassing);
+            $openLap->setRtcDiff($rtcDiff);
+
+            $this->lapRepository->save($openLap);
+
+            // Notify websocket of finished lap
+            $startParticipant = $startPassing->getTransponder()->getParticipant();
+            if ($startParticipant) {
+                $this->notifyWebSocket("FINISHED_LAP", [
+                    "team" => $team->getName(),
+                    "participant" => implode(
+                        array_filter([
+                            $startParticipant->getFirstName(),
+                            $startParticipant->getPrefix(),
+                            $startParticipant->getLastName()
+                        ]),
+                        " "
+                    ),
+                    "lapTime" => $openLap->getRtcDiff()
+                ]);
+            }
+            return;
         }
 
-        return $transponder;
+        if (!$openLap) {
+            $newLap = $this->lapRepository->create();
+            $newLap->setStartPassing($passing);
+            $newLap->setTeam($team);
+
+            $this->lapRepository->save($newLap);
+        }
     }
 }

@@ -29,7 +29,7 @@ class Lap
     private $finishPassing;
 
     /**
-    * @ORM\Column(type="bigint")
+    * @ORM\Column(type="bigint", nullable=true)
     */
     private $rtcDiff;
 
@@ -37,6 +37,12 @@ class Lap
     * @ORM\Column(type="datetime", nullable=true)
     */
     private $created;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Team", inversedBy="laps", cascade={"persist"})
+     * @ORM\JoinColumn(name="Team_id", referencedColumnName="id", nullable=true)
+     */
+    private $team;
 
     public function __construct()
     {
@@ -134,5 +140,29 @@ class Lap
     public function getRtcDiff()
     {
         return $this->rtcDiff;
+    }
+
+    /**
+     * Set team
+     *
+     * @param Team $team
+     *
+     * @return \P3RaceTimer\Entity\Lap
+     */
+    public function setTeam($team)
+    {
+        $this->team = $team;
+
+        return $this;
+    }
+
+    /**
+     * Get team
+     *
+     * @return string
+     */
+    public function getTeam()
+    {
+        return $this->team;
     }
 }

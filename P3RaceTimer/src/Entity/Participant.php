@@ -39,9 +39,15 @@ class Participant
     private $participantIdentifier;
 
     /**
-     * @ORM\OneToMany(targetEntity="Transponder", mappedBy="participant")
+     * @ORM\OneToMany(targetEntity="Transponder", mappedBy="participant", cascade={"persist"})
      */
     private $transponders;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Team", inversedBy="participants", cascade={"persist"})
+     * @ORM\JoinColumn(name="Team_id", referencedColumnName="id", nullable=true)
+     */
+    private $team;
 
     /**
      * Constructor
@@ -189,6 +195,20 @@ class Participant
     public function getTransponders()
     {
         return $this->transponders;
+    }
+
+    /**
+     * Set team
+     *
+     * @param \P3RaceTimer\Entity\Team $team
+     *
+     * @return \P3RaceTimer\Entity\Participant
+     */
+    public function setTeam(\P3RaceTimer\Entity\Team $team)
+    {
+        $this->team = $team;
+
+        return $this;
     }
 
     /**

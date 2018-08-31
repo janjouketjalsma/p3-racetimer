@@ -2,3 +2,4 @@
 .idea
 db.sqlite
 .env
+cache

@@ -91,6 +91,40 @@ class Transponder
     }
 
     /**
+     * Set participant
+     *
+     * @param \P3RaceTimer\Entity\Participant
+     */
+    public function setParticipant(Participant $participant)
+    {
+        $this->participant = $participant;
+
+        return $this;
+    }
+
+    /**
+     * Get participant
+     *
+     * @return \P3RaceTimer\Entity\Participant
+     */
+    public function getParticipant()
+    {
+        return $this->participant;
+    }
+
+    /**
+     * Set team
+     *
+     * @param \P3RaceTimer\Entity\Team
+     */
+    public function setTeam(Team $team)
+    {
+        $this->team = $team;
+
+        return $this;
+    }
+
+    /**
      * Get team
      *
      * @return \P3RaceTimer\Entity\Team

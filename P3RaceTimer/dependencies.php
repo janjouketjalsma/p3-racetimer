@@ -107,6 +107,16 @@ $container[P3RaceTimer\Console\EventProcessor::class] = function ($c) {
         $c->get('webSocketPusher'),
         $c->get('loop'),
         $c->get('em')->getRepository("P3RaceTimer\Entity\Transponder"),
-        $c->get('em')->getRepository("P3RaceTimer\Entity\Passing")
+        $c->get('em')->getRepository("P3RaceTimer\Entity\Passing"),
+        $c->get('em')->getRepository("P3RaceTimer\Entity\Lap")
+    );
+};
+
+$container[P3RaceTimer\Console\ImportParticipants::class] = function ($c) {
+    return new P3RaceTimer\Console\ImportParticipants(
+        $c->get('climate'),
+        $c->get('em')->getRepository("P3RaceTimer\Entity\Transponder"),
+        $c->get('em')->getRepository("P3RaceTimer\Entity\Team"),
+        $c->get('em')->getRepository("P3RaceTimer\Entity\Participant")
     );
 };

@@ -9,13 +9,25 @@ class TransponderRepository extends EntityRepository
 {
     public function findByIdentifier($identifier)
     {
-        return $this->find($identifier);
+        return $this->findOneBy(["identifier" => $identifier]);
     }
 
     public function create($transponderIdentifier)
     {
         $transponder = new Transponder();
         $transponder  ->setIdentifier($transponderIdentifier);
+
+        return $transponder;
+    }
+
+    public function getOrCreateTransponder($transponderIdentifier)
+    {
+        $transponder = $this->findByIdentifier($transponderIdentifier);
+
+        if (!$transponder) {
+            $transponder = $this->create($transponderIdentifier);
+            $this->prepare($transponder);
+        }
 
         return $transponder;
     }

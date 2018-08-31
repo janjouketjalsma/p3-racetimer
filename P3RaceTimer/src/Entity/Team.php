@@ -24,9 +24,19 @@ class Team
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity="Transponder", mappedBy="team")
+     * @ORM\OneToMany(targetEntity="Transponder", mappedBy="team", cascade={"persist"})
      */
     private $transponders;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Participant", mappedBy="team")
+     */
+    private $participants;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Lap", mappedBy="team")
+     */
+    private $laps;
 
     /**
      * Constructor
@@ -34,6 +44,8 @@ class Team
     public function __construct()
     {
         $this->transponders = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->participants = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->laps         = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -105,6 +117,16 @@ class Team
     }
 
     /**
+     * Get passings
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getParticipants()
+    {
+        return $this->participants;
+    }
+
+    /**
      * Get team
      *
      * @return \P3RaceTimer\Entity\Team
@@ -112,5 +134,15 @@ class Team
     public function getTeam()
     {
         return $this->team;
+    }
+
+    /**
+     * Get passings
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getLaps()
+    {
+        return $this->laps;
     }
 }
