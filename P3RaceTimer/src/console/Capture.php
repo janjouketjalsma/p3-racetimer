@@ -62,8 +62,8 @@ final class Capture
 
     protected function handleData($data, $eventSocket)
     {
-        $records = $this->p3Parser->trimData($data);
-        $completeRecords = $this->p3Parser->getRecords($records);
+        $records          = $this->p3Parser->trimData($data);
+        $completeRecords  = $this->p3Parser->getRecords($records);
 
         foreach ($completeRecords as $record) {
             $parsedRecord = $this->p3Parser->parse($record);
@@ -82,13 +82,13 @@ final class Capture
                     "record" => $parsedRecord
                 ]));
             }
-
-            // Create message entity
-            $decoderMessage = $this->decoderMessageRepository->create($record, $parsedRecord ?: null);
-
-            // Prepare database insert
-            $this->decoderMessageRepository->prepare($decoderMessage);
         }
+
+        // Create message entity
+        $decoderMessage = $this->decoderMessageRepository->create($data, $parsedRecord ?: null);
+
+        // Prepare database insert
+        $this->decoderMessageRepository->prepare($decoderMessage);
 
         // Insert messages into database
         $this->decoderMessageRepository->savePrepared();
