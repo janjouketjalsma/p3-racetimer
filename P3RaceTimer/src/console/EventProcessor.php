@@ -85,7 +85,7 @@ final class EventProcessor
 
             $this->passingRepository->save($passing);
 
-            $this->climate->out('PASSING ' . $eventData['PASSING_NUMBER']);
+            $this->climate->out('PROCESSOR: PASSING ' . $eventData['PASSING_NUMBER']);
 
             $team = $transponder->getTeam();
 
