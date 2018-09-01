@@ -125,7 +125,6 @@ final class EventProcessor
                     "lapTime" => $openLap->getRtcDiff()
                 ]);
             }
-            return;
         }
 
         $newLap = $this->lapRepository->create();
