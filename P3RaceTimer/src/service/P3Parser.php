@@ -151,7 +151,7 @@ class P3Parser
             $field_id = ord($record[$pos]); //The first byte of a message is the field ID
             if (!isset($fields[$field_id])) {
                 //$info['error']="Unknown message id: $field";
-                trigger_error("Unknown field ID at position " . dechex($pos) . ": " . dechex($field_id));
+                //trigger_error("Unknown field ID at position " . dechex($pos) . ": " . dechex($field_id));
                 $fields[$field_id] = 'unkown_' . dechex($pos);
             }
             $field_name = $fields[$field_id]; //Get the field name
