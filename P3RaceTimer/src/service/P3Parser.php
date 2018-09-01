@@ -121,7 +121,7 @@ class P3Parser
         $info['flags_header'] = $this->formatValue(substr($record, 0x6, 2), true);
         $info['type'] = $this->formatValue(substr($record, 0x8, 2)); //Get record type
         $info['type_string'] = $this->recordTypes[$info['type']];
-        $info['record_hex'] = $this->formatValue($record, true, false); //Get the complete record as a readable hex string
+        //$info['record_hex'] = $this->formatValue($record, true, false); //Get the complete record as a readable hex string
         return $info;
     }
 

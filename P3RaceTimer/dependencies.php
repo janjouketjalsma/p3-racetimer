@@ -37,23 +37,27 @@ $container['p3SocketPromise'] = function ($c) {
 };
 
 // Event socket for emitting events
-$container['eventSocketPromise'] = function ($c) {
+$container['eventPush'] = function ($c) {
     $settings           = $c->get('settings');
     $loop               = $c->get('loop');
-    $connector          = new React\Socket\Connector($loop);
+    $context            = new React\ZMQ\Context($loop);
 
-    $eventSocketPromise = $connector->connect('tcp://127.0.0.1:'.$settings['eventSocket']['port']);
+    $push = $context->getSocket(ZMQ::SOCKET_PUSH);
+    $push->connect('tcp://127.0.0.1:'.$settings['eventSocket']['port']);
 
-    return $eventSocketPromise;
+    return $push;
 };
 
 // Event server socket for receiving events
-$container['eventServerSocket'] = function ($c) {
+$container['eventPull'] = function ($c) {
     $settings           = $c->get('settings');
     $loop               = $c->get('loop');
-    $eventServerSocket  = new React\Socket\Server('tcp://127.0.0.1:'.$settings['eventSocket']['port'], $loop);
+    $context            = new React\ZMQ\Context($loop);
 
-    return $eventServerSocket;
+    $pull = $context->getSocket(ZMQ::SOCKET_PULL);
+    $pull->bind('tcp://127.0.0.1:'.$settings['eventSocket']['port']);
+
+    return $pull;
 };
 
 $container['webSocketPusher'] = function ($c) {
@@ -92,7 +96,7 @@ $container[P3RaceTimer\Console\Capture::class] = function ($c) {
         $c->get('climate'),
         $c->get('p3Parser'),
         $c->get('p3SocketPromise'),
-        $c->get('eventSocketPromise'),
+        $c->get('eventPush'),
         $c->get('loop'),
         $c->get('em')->getRepository("P3RaceTimer\Entity\DecoderMessage")
     );
@@ -101,7 +105,7 @@ $container[P3RaceTimer\Console\Capture::class] = function ($c) {
 $container[P3RaceTimer\Console\EventProcessor::class] = function ($c) {
     return new P3RaceTimer\Console\EventProcessor(
         $c->get('climate'),
-        $c->get('eventServerSocket'),
+        $c->get('eventPull'),
         $c->get('webSocketPusher'),
         $c->get('loop'),
         $c->get('em')->getRepository("P3RaceTimer\Entity\Transponder"),

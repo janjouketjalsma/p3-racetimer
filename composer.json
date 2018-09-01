@@ -10,7 +10,8 @@
         "react/datagram": "1.4",
         "cboden/ratchet": "^0.4.1",
         "doctrine/orm": "^2.6",
-        "league/csv": "^9.1"
+        "league/csv": "^9.1",
+        "react/zmq": "^0.4.0"
     },
     "autoload": {
         "psr-4": {

@@ -27,40 +27,38 @@ final class Capture
         CLImate $climate,
         P3Parser $p3Parser,
         PromiseInterface $p3ConnectorPromise,
-        PromiseInterface $eventSocketPromise,
+        React\ZMQ\SocketWrapper $eventPush,
         LoopInterface $loop,
         DecoderMessageRepository $decoderMessageRepository
     ) {
         $this->climate                  = $climate;
         $this->p3Parser                 = $p3Parser;
         $this->p3ConnectorPromise       = $p3ConnectorPromise;
-        $this->eventSocketPromise       = $eventSocketPromise;
+        $this->eventPush                = $eventPush;
         $this->loop                     = $loop;
         $this->decoderMessageRepository = $decoderMessageRepository;
     }
 
     public function __invoke(Request $request, Response $response, $args)
     {
-        Promise\all([$this->p3ConnectorPromise, $this->eventSocketPromise])->then(function ($values) {
-            $p3Connector = $values[0];
-            $eventSocket = $values[1];
+        $this->p3ConnectorPromise->then(function ($p3Connector) {
             $this->climate->out('Waiting for events on p3 connection');
-            $this->capture($p3Connector, $eventSocket);
+            $this->capture($p3Connector);
         });
         $this->loop->run();
     }
 
-    protected function capture(ConnectionInterface $p3Connector, ConnectionInterface $eventSocket)
+    protected function capture(ConnectionInterface $p3Connector)
     {
-        $p3Connector->on("data", function ($data) use ($eventSocket) {
-            $this->handleData($data, $eventSocket);
+        $p3Connector->on("data", function ($data) {
+            $this->handleData($data);
         });
         $p3Connector->on("connection", function () {
             $this->climate->out('p3 connection established');
         });
     }
 
-    protected function handleData($data, $eventSocket)
+    protected function handleData($data)
     {
         $records          = $this->p3Parser->trimData($data);
         $completeRecords  = $this->p3Parser->getRecords($records);
@@ -77,7 +75,7 @@ final class Capture
                 }
 
                 // Send record to eventSocket
-                $eventSocket->write(json_encode([
+                $this->eventPush->send(json_encode([
                     "source" => "p3connection",
                     "event" => $parsedRecord["type_string"],
                     "record" => $parsedRecord

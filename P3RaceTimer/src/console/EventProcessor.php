@@ -22,7 +22,7 @@ final class EventProcessor
 {
 
     protected $climate;
-    protected $eventServerSocket;
+    protected $eventPull;
     protected $webSocketPusher;
     protected $loop;
     protected $transponderRepository;
@@ -31,7 +31,7 @@ final class EventProcessor
 
     public function __construct(
         CLImate $climate,
-        Server $eventServerSocket,
+        React\ZMQ\SocketWrapper $eventPull,
         WebSocketPusher $webSocketPusher,
         React\EventLoop\LoopInterface $loop,
         TransponderRepository $transponderRepository,
@@ -39,7 +39,7 @@ final class EventProcessor
         LapRepository $lapRepository
     ) {
         $this->climate                = $climate;
-        $this->eventServerSocket      = $eventServerSocket;
+        $this->eventPull              = $eventPull;
         $this->webSocketPusher        = $webSocketPusher;
         $this->loop                   = $loop;
         $this->transponderRepository  = $transponderRepository;
@@ -51,28 +51,19 @@ final class EventProcessor
     {
         $this->climate->out('Waiting for events on connection');
 
-        $this->eventServerSocket->on('connection', function (ConnectionInterface $conn) {
-            $this->climate->out("Connection established by ".$conn->getRemoteAddress());
+        $this->eventPull->on('message', function ($msg) {
+            $messageData = \json_decode($msg, true);
 
-            $conn->on('data', function ($data) {
-                //$this->climate->out('received ' . $data);
+            if (isset($messageData["source"])) {
+                if ($messageData["source"] == "p3connection") {
+                    // Notify websocket with record update
+                    $this->notifyWebSocket($messageData["event"], $messageData["record"]);
 
-                $messageData = \json_decode($data, true);
-
-                if (isset($messageData["source"])) {
-                    if ($messageData["source"] == "p3connection") {
-                        // Notify websocket with record update
-                        $this->notifyWebSocket($messageData["event"], $messageData["record"]);
-
-                        // Process message
-                        $this->processP3message($messageData["event"], $messageData["record"]);
-                    }
+                    // Process message
+                    $this->processP3message($messageData["event"], $messageData["record"]);
                 }
-            });
+            }
         });
-
-
-
         $this->loop->run();
     }
 
