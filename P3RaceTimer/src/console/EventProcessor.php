@@ -6,6 +6,8 @@ use League\CLImate\CLImate;
 use P3RaceTimer\Service\WebSocketPusher;
 use React;
 use Ratchet;
+use React\Socket\Server;
+use React\Socket\ConnectionInterface;
 use P3RaceTimer\Entity\TransponderRepository;
 use P3RaceTimer\Entity\PassingRepository;
 use P3RaceTimer\Entity\LapRepository;
@@ -20,7 +22,7 @@ final class EventProcessor
 {
 
     protected $climate;
-    protected $eventSocketPromise;
+    protected $eventServerSocket;
     protected $webSocketPusher;
     protected $loop;
     protected $transponderRepository;
@@ -29,7 +31,7 @@ final class EventProcessor
 
     public function __construct(
         CLImate $climate,
-        React\Promise\PromiseInterface $eventSocketPromise,
+        Server $eventServerSocket,
         WebSocketPusher $webSocketPusher,
         React\EventLoop\LoopInterface $loop,
         TransponderRepository $transponderRepository,
@@ -37,7 +39,7 @@ final class EventProcessor
         LapRepository $lapRepository
     ) {
         $this->climate                = $climate;
-        $this->eventSocketPromise     = $eventSocketPromise;
+        $this->eventServerSocket      = $eventServerSocket;
         $this->webSocketPusher        = $webSocketPusher;
         $this->loop                   = $loop;
         $this->transponderRepository  = $transponderRepository;
@@ -49,11 +51,13 @@ final class EventProcessor
     {
         $this->climate->out('Waiting for events on connection');
 
-        $this->eventSocketPromise->then(function (React\Datagram\Socket $eventSocket) {
-            $eventSocket->on('message', function ($message, $serverAddress, $eventSocket) {
-                $this->climate->out('received "' . $message . '" from ' . $serverAddress);
+        $this->eventServerSocket->on('connection', function (ConnectionInterface $conn) {
+            $this->climate->out("Connection established by ".$conn->getRemoteAddress());
 
-                $messageData = \json_decode($message, true);
+            $conn->on('data', function ($data) {
+                //$this->climate->out('received ' . $data);
+
+                $messageData = \json_decode($data, true);
 
                 if (isset($messageData["source"])) {
                     if ($messageData["source"] == "p3connection") {
@@ -66,6 +70,8 @@ final class EventProcessor
                 }
             });
         });
+
+
 
         $this->loop->run();
     }
@@ -87,6 +93,8 @@ final class EventProcessor
             );
 
             $this->passingRepository->save($passing);
+
+            $this->climate->out('PASSING ' . $eventData['PASSING_NUMBER']);
 
             $team = $transponder->getTeam();
 

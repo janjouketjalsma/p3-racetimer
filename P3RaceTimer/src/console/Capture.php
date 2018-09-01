@@ -50,7 +50,7 @@ final class Capture
         $this->loop->run();
     }
 
-    protected function capture(ConnectionInterface $p3Connector, React\Datagram\Socket $eventSocket)
+    protected function capture(ConnectionInterface $p3Connector, ConnectionInterface $eventSocket)
     {
         $p3Connector->on("data", function ($data) use ($eventSocket) {
             $this->handleData($data, $eventSocket);
@@ -69,16 +69,15 @@ final class Capture
             $parsedRecord = $this->p3Parser->parse($record);
 
             if ($parsedRecord) {
-                $this->climate->dump($parsedRecord);
+                //$this->climate->dump($parsedRecord);
 
-                // Example: output record date as string
-                if(isset($parsedRecord["RTC_TIME"])){
-                    $recordTime = \DateTime::createFromFormat('U', round($parsedRecord["RTC_TIME"] / 1000000));
-                    $this->climate->out('Got record with date: ' . $recordTime->format('Y-m-d H:i:s'));
+
+                if ($parsedRecord["type_string"] == "PASSING") {
+                    $this->climate->out("PASSING ".$parsedRecord["PASSING_NUMBER"]);
                 }
 
                 // Send record to eventSocket
-                $eventSocket->send(json_encode([
+                $eventSocket->write(json_encode([
                     "source" => "p3connection",
                     "event" => $parsedRecord["type_string"],
                     "record" => $parsedRecord

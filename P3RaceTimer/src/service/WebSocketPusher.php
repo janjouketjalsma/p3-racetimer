@@ -90,8 +90,8 @@ class WebSocketPusher implements WampServerInterface {
     public function onEvent($topic, $eventData)
     {
         // Always broadcast to all
-        $all = $this->subscribedTopics["ALL"];
-        if ($all) {
+        if (isset($this->subscribedTopics["ALL"])) {
+            $all = $this->subscribedTopics["ALL"];
             $all->broadcast($eventData);
         }
 

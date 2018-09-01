@@ -40,11 +40,20 @@ $container['p3SocketPromise'] = function ($c) {
 $container['eventSocketPromise'] = function ($c) {
     $settings           = $c->get('settings');
     $loop               = $c->get('loop');
-    $factory            = new React\Datagram\Factory($loop);
+    $connector          = new React\Socket\Connector($loop);
 
-    $eventSocketPromise = $factory->createClient('localhost:'.$settings['eventSocket']['port']);
+    $eventSocketPromise = $connector->connect('tcp://127.0.0.1:'.$settings['eventSocket']['port']);
 
     return $eventSocketPromise;
+};
+
+// Event server socket for receiving events
+$container['eventServerSocket'] = function ($c) {
+    $settings           = $c->get('settings');
+    $loop               = $c->get('loop');
+    $eventServerSocket  = new React\Socket\Server('tcp://127.0.0.1:'.$settings['eventSocket']['port'], $loop);
+
+    return $eventServerSocket;
 };
 
 $container['webSocketPusher'] = function ($c) {
@@ -64,17 +73,6 @@ $container['webSocketPusher'] = function ($c) {
     );
 
     return $pusher;
-};
-
-// Event server socket for receiving events
-$container['eventServerSocketPromise'] = function ($c) {
-    $settings           = $c->get('settings');
-    $loop               = $c->get('loop');
-    $factory            = new React\Datagram\Factory($loop);
-
-    $eventServerSocketPromise = $factory->createServer('localhost:'.$settings['eventSocket']['port']);
-
-    return $eventServerSocketPromise;
 };
 
 // Doctrine
@@ -103,7 +101,7 @@ $container[P3RaceTimer\Console\Capture::class] = function ($c) {
 $container[P3RaceTimer\Console\EventProcessor::class] = function ($c) {
     return new P3RaceTimer\Console\EventProcessor(
         $c->get('climate'),
-        $c->get('eventServerSocketPromise'),
+        $c->get('eventServerSocket'),
         $c->get('webSocketPusher'),
         $c->get('loop'),
         $c->get('em')->getRepository("P3RaceTimer\Entity\Transponder"),
