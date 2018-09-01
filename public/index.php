@@ -7,6 +7,15 @@
   <style>
     html, body{
       font-size:1em;
+      overflow-x:hidden;
+    }
+
+    .lapRows:nth-child(1){
+      font-size:1.5em;
+    }
+
+    .lapRows:nth-child(2){
+      font-size:1.2em;
     }
 
     .lapColumns {
@@ -19,7 +28,7 @@
       -moz-column-fill: auto;
          column-fill: auto;
     }
-    @media (max-width: 500px) {
+    @media (max-width: 1000px) {
       .lapColumns {
         -webkit-column-count: 1; /* Chrome, Safari, Opera */
         -moz-column-count: 1; /* Firefox */
@@ -39,7 +48,7 @@
               <th scope="col">Participant</th>
               <th scope="col">Time</th>
             </thead>
-            <tbody class="finishedLaps-1">
+            <tbody class="finishedLaps-1 lapRows">
             </tbody>
           </table>
         </div>
@@ -72,13 +81,13 @@
       );
 
       function insertLap(lapData) {
-          $finishedLaps1.prepend(' \
-            <tr> \
+          $(' \
+            <tr class="lapRow" style="opacity:0"> \
               <td>'+ lapData.team +'</td> \
               <td><span class="font-weight-bold">'+ lapData.participant +'</span></td> \
               <td><span class="text-monospace font-weight-bold">'+ getTimeString(lapData.lapTime / 1000) +'</span></td> \
             </tr>'
-          );
+          ).prependTo($finishedLaps1).fadeTo(500, 1);
       }
 
       var getTimeString = function(timeInMs, excludeHundreds) {
