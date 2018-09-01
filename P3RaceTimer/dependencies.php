@@ -23,6 +23,14 @@ $container['p3Parser'] = function ($c) {
 $container['loop'] = function ($c) {
     $loop = React\EventLoop\Factory::create();
 
+    // Force garbage collection
+    $loop->addPeriodicTimer(
+        1,
+        function () {
+            gc_collect_cycles();
+        }
+    );
+
     return $loop;
 };
 
