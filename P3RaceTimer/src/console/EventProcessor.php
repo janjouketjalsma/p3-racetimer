@@ -110,15 +110,15 @@ final class EventProcessor
             $this->lapRepository->save($openLap);
 
             // Notify websocket of finished lap
-            $startParticipant = $startPassing->getTransponder()->getParticipant();
-            if ($startParticipant) {
+            $finishParticipant = $finishPassing->getTransponder()->getParticipant();
+            if ($finishParticipant) {
                 $this->notifyWebSocket("FINISHED_LAP", [
                     "team" => $team->getName(),
                     "participant" => implode(
                         array_filter([
-                            $startParticipant->getFirstName(),
-                            $startParticipant->getPrefix(),
-                            $startParticipant->getLastName()
+                            $finishParticipant->getFirstName(),
+                            $finishParticipant->getPrefix(),
+                            $finishParticipant->getLastName()
                         ]),
                         " "
                     ),
