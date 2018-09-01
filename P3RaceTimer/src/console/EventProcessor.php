@@ -129,12 +129,10 @@ final class EventProcessor
             return;
         }
 
-        if (!$openLap) {
-            $newLap = $this->lapRepository->create();
-            $newLap->setStartPassing($passing);
-            $newLap->setTeam($team);
+        $newLap = $this->lapRepository->create();
+        $newLap->setStartPassing($passing);
+        $newLap->setTeam($team);
 
-            $this->lapRepository->save($newLap);
-        }
+        $this->lapRepository->save($newLap);
     }
 }
