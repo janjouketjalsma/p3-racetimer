@@ -16,14 +16,16 @@
       <h1 class="display-1">Lap times</h1>
       <div class="row">
         <div class="col-lg">
-          <ul class="list-group list-group-flush finishedLaps-1">
-
-          </ul>
+          <table class="table">
+            <tbody class="finishedLaps-1">
+            </tbody>
+          </table>
         </div>
         <div class="col-lg">
-          <ul class="list-group list-group-flush finishedLaps-2">
-
-          </ul>
+          <table class="table">
+            <tbody class="finishedLaps-2">
+            </tbody>
+          </table>
         </div>
       </div>
   </div>
@@ -54,7 +56,7 @@
       );
 
       function insertLap(lapData) {
-          $finishedLaps1.prepend('<li class="list-group-item"><div class="d-flex justify-content-between"><div>'+ lapData.team +'</div><div>'+ lapData.participant +'</div><div>'+ getTimeString(lapData.lapTime / 1000) +'</div></div></li>');
+          $finishedLaps1.prepend('<tr><th scope="row">'+ lapData.team +'</th><td>'+ lapData.participant +'</td><td>'+ getTimeString(lapData.lapTime / 1000) +'</td></td></tr>');
       }
 
       var getTimeString = function(timeInMs) {
