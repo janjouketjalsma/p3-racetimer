@@ -56,7 +56,7 @@
       );
 
       function insertLap(lapData) {
-          $finishedLaps1.prepend('<tr><th scope="row">'+ lapData.team +'</th><td>'+ lapData.participant +'</td><td>'+ getTimeString(lapData.lapTime / 1000) +'</td></td></tr>');
+          $finishedLaps1.prepend('<tr><td>'+ lapData.team +'</td><td><span class="font-weight-bold">'+ lapData.participant +'</span></td><td><span class="text-monospace font-weight-bold">'+ getTimeString(lapData.lapTime / 1000) +'</span></td></tr>');
       }
 
       var getTimeString = function(timeInMs) {
