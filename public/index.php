@@ -8,32 +8,38 @@
     html, body{
       font-size:1em;
     }
+
+    .lapColumns {
+      -webkit-column-count: 2; /* Chrome, Safari, Opera */
+      -moz-column-count: 2; /* Firefox */
+      column-count: 2;
+      height: -moz-calc(100vh - 150px);
+      height: -webkit-calc(100vh - 150px);
+      height: calc(100vh - 150px);
+      -moz-column-fill: auto;
+         column-fill: auto;
+    }
+    @media (max-width: 500px) {
+      .lapColumns {
+        -webkit-column-count: 1; /* Chrome, Safari, Opera */
+        -moz-column-count: 1; /* Firefox */
+        column-count: 1;
+      }
+    }
   </style>
 </head>
 
 <body>
   <div class="container-fluid">
       <h1 class="display-1">Lap times</h1>
-      <div class="row">
-        <div class="col-lg">
-          <table class="table">
+      <div class="lapColumns">
+          <table class="table-striped">
             <thead>
               <th scope="col">Team</th>
               <th scope="col">Participant</th>
               <th scope="col">Time</th>
             </thead>
             <tbody class="finishedLaps-1">
-            </tbody>
-          </table>
-        </div>
-        <div class="col-lg">
-          <table class="table">
-            <thead>
-              <th scope="col">Team</th>
-              <th scope="col">Participant</th>
-              <th scope="col">Time</th>
-            </thead>
-            <tbody class="finishedLaps-2">
             </tbody>
           </table>
         </div>
