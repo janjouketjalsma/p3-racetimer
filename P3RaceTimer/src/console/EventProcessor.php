@@ -101,7 +101,7 @@ final class EventProcessor
 
         if ($openLap) {
             $finishPassing  = $passing;
-            $startPassing   = $openLap->getStartPassing($team);
+            $startPassing   = $openLap->getStartPassing();
             $rtcDiff        = $finishPassing->getRtc() - $startPassing->getRtc();
 
             $openLap->setFinishPassing($finishPassing);
@@ -122,6 +122,8 @@ final class EventProcessor
                         ]),
                         " "
                     ),
+                    "startTime" => $startPassing->getRtc(),
+                    "finishTime" => $finishPassing->getRtc(),
                     "lapTime" => $openLap->getRtcDiff()
                 ]);
             }

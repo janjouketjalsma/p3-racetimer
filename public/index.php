@@ -17,6 +17,13 @@
       <div class="row">
         <div class="col-lg">
           <table class="table">
+            <thead>
+              <th scope="col">Team</th>
+              <th scope="col">Start</th>
+              <th scope="col">Finish</th>
+              <th scope="col">Participant</th>
+              <th scope="col">Time</th>
+            </thead>
             <tbody class="finishedLaps-1">
             </tbody>
           </table>
@@ -56,10 +63,19 @@
       );
 
       function insertLap(lapData) {
-          $finishedLaps1.prepend('<tr><td>'+ lapData.team +'</td><td><span class="font-weight-bold">'+ lapData.participant +'</span></td><td><span class="text-monospace font-weight-bold">'+ getTimeString(lapData.lapTime / 1000) +'</span></td></tr>');
+          $finishedLaps1.prepend(' \
+            <tr> \
+              <td>'+ lapData.team +'</td> \
+              <td><span class="font-weight-light">'+ getDateString(parseInt(lapData.startTime / 1000)) +'</span></td> \
+              <td><span class="font-weight-light">'+ getDateString(parseInt(lapData.finishTime / 1000)) +'</span></td> \
+              <td><span class="font-weight-bold">'+ lapData.participant +'</span></td> \
+              <td><span class="text-monospace font-weight-bold">'+ getTimeString(lapData.lapTime / 1000) +'</span></td> \
+            </tr>'
+          );
       }
 
-      var getTimeString = function(timeInMs) {
+      var getTimeString = function(timeInMs, excludeHundreds) {
+
         var delim = ":";
         var minutes = Math.floor(timeInMs / (1000 * 60));
         var seconds = Math.floor(timeInMs / 1000 % 60);
@@ -67,7 +83,24 @@
 
         minutes = minutes < 10 ? '0' + minutes : minutes;
         seconds = seconds < 10 ? '0' + seconds : seconds;
-        return minutes + delim + seconds + delim + pad000(hundreds + "");
+        var ret = minutes + delim + seconds
+        if(!excludeHundreds){
+          ret += delim + pad000(hundreds + "");
+        }
+        return ret;
+      }
+
+      var getDateString = function (timeInMs) {
+        var date = new Date(timeInMs);
+        // Hours part from the timestamp
+        var hours = date.getHours();
+        // Minutes part from the timestamp
+        var minutes = "0" + date.getMinutes();
+        // Seconds part from the timestamp
+        var seconds = "0" + date.getSeconds();
+        // Will display time in 10:30:23 format
+        var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+        return formattedTime;
       }
 
       var pad000 = function (str) {
